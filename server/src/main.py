@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
+
 from src.core.database import postgres_engine, Base
 from src.core.metrics import MetricsMiddleware, metrics_endpoint
+from src.api.users import router as users_router
 
 
 app = FastAPI(
@@ -12,6 +14,7 @@ app = FastAPI(
 )
 
 app.add_middleware(MetricsMiddleware)
+app.include_router(users_router)
 
 @app.get("/")
 async def root():
