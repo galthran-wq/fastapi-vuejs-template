@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  postgres:
+    ports:
+      - "${DEV_POSTGRES_PORT:-5444}:5432"
+    volumes:
+      - ./data/postgres_dev:/var/lib/postgresql/data
+
+  server:
+    command: ["bash", "startup.sh"]
+    volumes:
+      - ./server:/app
+      - ./server/.env:/app/.env:ro
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      target: build
+    command: ["npm", "run", "dev", "--", "--host"]
+    volumes:
+      - ./client:/app
+
+  nginx:
+    ports:
+      - "${DEV_NGINX_PORT:-5746}:80"
+    volumes:
+      - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
+
+  prometheus:
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+
+  grafana:
+    environment:
+      - GF_SERVER_ROOT_URL=http://localhost:${DEV_NGINX_PORT:-5746}/grafana/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+
+volumes:
+  dev_postgres_data:
+  dev_mongodb_data:
+  prometheus_data:
+  grafana_data: 
