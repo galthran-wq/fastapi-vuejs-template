@@ -18,9 +18,10 @@ services:
       context: ./client
       dockerfile: Dockerfile
       target: build
-    command: ["npm", "run", "dev", "--", "--host"]
+    command: ["sh", "-lc", "npm ci || npm install; npm run dev -- --host"]
     volumes:
       - ./client:/app
+      - /app/node_modules
 
   nginx:
     ports:
