@@ -24,13 +24,12 @@ if os.path.exists('/app/src'):
 
 try:
     from src.core.database import postgres_engine, AsyncSessionLocal
-    from src.repositories.user_repository import UserRepository
+    from src.repositories.users import UserRepository
     from src.core.auth import get_password_hash
 except ImportError:
-    # Fallback for Docker environment
     sys.path.insert(0, '/app')
     from src.core.database import postgres_engine, AsyncSessionLocal
-    from src.repositories.user_repository import UserRepository
+    from src.repositories.users import UserRepository
     from src.core.auth import get_password_hash
 
 
@@ -54,8 +53,7 @@ async def create_user(email: str, password: str):
             print(f"✅ Successfully created user:")
             print(f"   Email: {user.email}")
             print(f"   UUID: {user.id}")
-            print(f"   Balance: {user.balance} tokens")
-            print(f"   Registered: {'Yes' if user.is_registered else 'No'}")
+            print(f"   Verified: {'Yes' if user.is_verified else 'No'}")
             print(f"   Superuser: {'Yes' if user.is_superuser else 'No'}")
             
             return True
@@ -90,12 +88,12 @@ async def list_users():
             
             print(f"Found {len(users)} user(s):")
             print()
-            print(f"{'Email':<30} {'UUID':<36} {'Registered':<10} {'Superuser':<10}")
+            print(f"{'Email':<30} {'UUID':<36} {'Verified':<10} {'Superuser':<10}")
             print("-" * 80)
             
             for user in users:
                 email = user.email or "N/A"
-                registered = "Yes" if user.is_registered else "No"
+                registered = "Yes" if user.is_verified else "No"
                 superuser = "Yes" if user.is_superuser else "No"
                 print(f"{email:<30} {str(user.id):<36} {registered:<10} {superuser:<10}")
                 

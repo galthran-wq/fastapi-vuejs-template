@@ -42,11 +42,7 @@ class UserRepository(UserRepositoryInterface):
         self.session = session
     
     async def create_user(self) -> UserModel:
-        """Create a new anonymous user"""
-        db_user = UserModel(
-            balance=0.0,
-            is_registered=False
-        )
+        db_user = UserModel()
         self.session.add(db_user)
         await self.session.commit()
         await self.session.refresh(db_user)
@@ -91,12 +87,11 @@ class UserRepository(UserRepositoryInterface):
             existing_user = await self.get_user_by_email(email)
             if existing_user:
                 raise ValueError("Email already registered")
-            
+
             db_user = UserModel(
                 email=email,
                 password_hash=password_hash,
-                balance=100.0,
-                is_registered=True,
+                is_verified=True,
                 is_superuser=False
             )
             

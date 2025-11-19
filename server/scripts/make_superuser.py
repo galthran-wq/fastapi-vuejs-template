@@ -25,12 +25,11 @@ if os.path.exists('/app/src'):
 
 try:
     from src.core.database import postgres_engine, AsyncSessionLocal
-    from src.repositories.user_repository import UserRepository
+    from src.repositories.users import UserRepository
 except ImportError:
-    # Fallback for Docker environment
     sys.path.insert(0, '/app')
     from src.core.database import postgres_engine, AsyncSessionLocal
-    from src.repositories.user_repository import UserRepository
+    from src.repositories.users import UserRepository
 
 
 async def make_superuser(user_identifier: str):
@@ -80,7 +79,6 @@ async def make_superuser(user_identifier: str):
 
 
 async def list_users():
-    """List all users in the system"""
     async with AsyncSessionLocal() as session:
         user_repo = UserRepository(session)
         
@@ -97,12 +95,12 @@ async def list_users():
             
             print("📋 Users in the system:")
             print("-" * 80)
-            print(f"{'Email':<30} {'UUID':<36} {'Registered':<10} {'Superuser':<10}")
+            print(f"{'Email':<30} {'UUID':<36} {'Verified':<10} {'Superuser':<10}")
             print("-" * 80)
             
             for user in users:
                 email = user.email or "N/A"
-                registered = "Yes" if user.is_registered else "No"
+                registered = "Yes" if user.is_verified else "No"
                 superuser = "Yes" if user.is_superuser else "No"
                 print(f"{email:<30} {str(user.id):<36} {registered:<10} {superuser:<10}")
                 

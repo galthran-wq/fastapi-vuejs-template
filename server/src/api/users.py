@@ -74,7 +74,7 @@ async def login_user(
     try:
         user = await user_repo.get_user_by_email(request.email)
         
-        if not user or not user.is_registered:
+        if not user or not user.is_verified:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid email or password"

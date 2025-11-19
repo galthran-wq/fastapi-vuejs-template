@@ -40,11 +40,10 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
 
 
 def create_token_for_user(user: UserModel) -> str:
-    """Create a JWT token for a user"""
     token_data = {
         "sub": str(user.id),
         "email": user.email,
-        "is_registered": user.is_registered,
+        "is_verified": user.is_verified,
         "is_superuser": user.is_superuser
     }
     return create_access_token(token_data)
