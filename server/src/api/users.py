@@ -138,6 +138,8 @@ async def create_user_by_superuser(
             success=False,
             message=str(e)
         )
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
