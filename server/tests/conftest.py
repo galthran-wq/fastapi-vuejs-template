@@ -1,13 +1,16 @@
+import os
 from collections.abc import AsyncIterator
 
-import pytest
-from httpx import ASGITransport, AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.pool import StaticPool
-from src.core.auth import create_token_for_user, get_password_hash
-from src.core.database import Base, get_postgres_session
-from src.main import app
-from src.models.postgres.users import UserModel
+os.environ.setdefault("DEBUG", "true")
+
+import pytest  # noqa: E402
+from httpx import ASGITransport, AsyncClient  # noqa: E402
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine  # noqa: E402
+from sqlalchemy.pool import StaticPool  # noqa: E402
+from src.core.auth import create_token_for_user, get_password_hash  # noqa: E402
+from src.core.database import Base, get_postgres_session  # noqa: E402
+from src.main import app  # noqa: E402
+from src.models.postgres.users import UserModel  # noqa: E402
 
 test_engine = create_async_engine("sqlite+aiosqlite://", echo=False, poolclass=StaticPool)
 TestSessionLocal = async_sessionmaker(test_engine, class_=AsyncSession, expire_on_commit=False)
