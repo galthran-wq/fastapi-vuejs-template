@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
+from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.core.database import get_postgres_session
@@ -18,9 +19,14 @@ async def health_check() -> HealthResponse:
 
 
 @router.get("/ready")
-async def readiness_check(session: AsyncSession = Depends(get_postgres_session)) -> dict[str, str]:
+async def readiness_check(
+    session: AsyncSession = Depends(get_postgres_session),
+) -> dict[str, str] | JSONResponse:
     try:
         await session.execute(text("SELECT 1"))
         return {"status": "ready", "database": "connected"}
     except Exception:
-        return {"status": "not_ready", "database": "disconnected"}
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content={"status": "not_ready", "database": "disconnected"},
+        )

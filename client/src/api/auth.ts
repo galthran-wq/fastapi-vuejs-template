@@ -30,8 +30,13 @@ export async function registerUser(email: string, password: string): Promise<Tok
   localStorage.setItem('token', anon.access_token)
 
   // Step 2: register with email/password using the anon token
-  const { data } = await api.post<TokenResponse>('/users/register', { email, password })
-  return data
+  try {
+    const { data } = await api.post<TokenResponse>('/users/register', { email, password })
+    return data
+  } catch (error) {
+    localStorage.removeItem('token')
+    throw error
+  }
 }
 
 export async function getCurrentUser(): Promise<UserResponse> {
