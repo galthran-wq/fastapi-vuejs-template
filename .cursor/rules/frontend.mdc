@@ -1,6 +1,6 @@
 ---
 description: "Vue.js frontend conventions"
-globs: ["client/**/*.{ts,vue}"]
+globs: client/src/**/*.ts, client/src/**/*.vue
 alwaysApply: false
 ---
 

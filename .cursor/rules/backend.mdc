@@ -1,6 +1,6 @@
 ---
 description: "FastAPI backend conventions"
-globs: ["server/**/*.py"]
+globs: server/**/*.py
 alwaysApply: false
 ---
 
