@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
 from fastapi import Depends, HTTPException, status
@@ -17,29 +17,29 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a plain password against its hash"""
-    return pwd_context.verify(plain_password, hashed_password)
+    return bool(pwd_context.verify(plain_password, hashed_password))
 
 
 def get_password_hash(password: str) -> str:
     """Generate password hash"""
-    return pwd_context.hash(password)
+    return str(pwd_context.hash(password))
 
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
+def create_access_token(data: dict[str, object], expires_delta: timedelta | None = None) -> str:
     """Create JWT access token"""
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.now(datetime.UTC) + expires_delta
+        expire = datetime.now(UTC) + expires_delta
     else:
-        expire = datetime.now(datetime.UTC) + timedelta(minutes=settings.jwt_expire_minutes)
+        expire = datetime.now(UTC) + timedelta(minutes=settings.jwt_expire_minutes)
 
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, settings.secret_key, algorithm=settings.jwt_algorithm)
+    encoded_jwt: str = jwt.encode(to_encode, settings.secret_key, algorithm=settings.jwt_algorithm)
     return encoded_jwt
 
 
 def create_token_for_user(user: UserModel) -> str:
-    token_data = {
+    token_data: dict[str, object] = {
         "sub": str(user.id),
         "email": user.email,
         "is_verified": user.is_verified,
@@ -54,10 +54,10 @@ def decode_jwt_token(token: str) -> tuple[bool, UUID | None, str | None]:
     Returns: (success, user_id, error_message)
     """
     try:
-        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.jwt_algorithm])
-        user_id_str: str = payload.get("sub")
+        payload: dict[str, object] = jwt.decode(token, settings.secret_key, algorithms=[settings.jwt_algorithm])
+        user_id_str = payload.get("sub")
 
-        if user_id_str is None:
+        if not isinstance(user_id_str, str):
             return False, None, "Could not validate credentials"
 
         user_id = UUID(user_id_str)
@@ -77,7 +77,7 @@ async def validate_user_from_token(
     Returns: (success, user, error_message)
     """
     success, user_id, error = decode_jwt_token(token)
-    if not success:
+    if not success or user_id is None:
         return False, None, error
 
     user_repo = UserRepository(postgres_session)
@@ -94,7 +94,6 @@ async def get_current_user(
     postgres_session: AsyncSession = Depends(get_postgres_session),
 ) -> UserModel:
     """Get the current user from JWT token"""
-    # Handle missing credentials manually to return 401 instead of 403
     if not credentials:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -104,7 +103,7 @@ async def get_current_user(
 
     success, user, error = await validate_user_from_token(credentials.credentials, postgres_session)
 
-    if not success:
+    if not success or user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",

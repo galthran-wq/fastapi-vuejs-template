@@ -1,5 +1,7 @@
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from collections.abc import AsyncIterator
+
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import DeclarativeBase
 
 from .config import settings
 
@@ -9,9 +11,9 @@ class Base(DeclarativeBase):
 
 
 postgres_engine = create_async_engine(settings.postgres_url, echo=settings.debug)
-AsyncSessionLocal = sessionmaker(postgres_engine, class_=AsyncSession, expire_on_commit=False)
+AsyncSessionLocal = async_sessionmaker(postgres_engine, class_=AsyncSession, expire_on_commit=False)
 
 
-async def get_postgres_session() -> AsyncSession:  # type: ignore[misc]
+async def get_postgres_session() -> AsyncIterator[AsyncSession]:
     async with AsyncSessionLocal() as session:
         yield session
