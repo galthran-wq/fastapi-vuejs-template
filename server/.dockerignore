@@ -3,22 +3,23 @@ __pycache__
 *.pyo
 *.pyd
 .Python
-env
-pip-log.txt
-pip-delete-this-directory.txt
+.venv
+venv
+
 .tox
 .coverage
 .coverage.*
 .cache
+.mypy_cache
+.pytest_cache
+.ruff_cache
+.hypothesis
 nosetests.xml
 coverage.xml
 *.cover
 *.log
-.git
-.mypy_cache
-.pytest_cache
-.hypothesis
 
+.git
 .DS_Store
 .vscode
 .idea
@@ -31,13 +32,6 @@ coverage.xml
 .env.local
 .env.*.local
 
-node_modules
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
 data/
 tests/
-.pytest_cache/
-.venv/
-venv/ 
+.pre-commit-config.yaml

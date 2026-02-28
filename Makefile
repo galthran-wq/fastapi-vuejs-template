@@ -1,4 +1,4 @@
-.PHONY: dev-up dev-down dev-ps dev-logs dev-restart dev-db dev-make-migrations dev-test-db dev-test-migrate dev-test prod-up prod-down prod-ps prod-logs prod-restart prod-build
+.PHONY: dev-up dev-down dev-ps dev-logs dev-restart dev-db dev-make-migrations dev-test-db dev-test-migrate dev-test dev-lint dev-format prod-up prod-down prod-ps prod-logs prod-restart prod-build
 .SILENT:
 
 -include .env
@@ -39,6 +39,12 @@ dev-test-migrate:
 
 dev-test:
 	docker compose -p $(COMPOSE_PROJECT_NAME_DEV) exec -e POSTGRES_DB=$(POSTGRES_DB)_test -e PYTHONPATH=/app server bash -lc "pytest tests/ -v $(ARGS)"
+
+dev-lint:
+	docker compose -p $(COMPOSE_PROJECT_NAME_DEV) exec server bash -lc "ruff check src tests && ruff format --check src tests && mypy src"
+
+dev-format:
+	docker compose -p $(COMPOSE_PROJECT_NAME_DEV) exec server bash -lc "ruff format src tests && ruff check --fix src tests"
 
 dev-superuser:
 	@if [ -z "$(ARGS)" ]; then \
