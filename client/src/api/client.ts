@@ -17,7 +17,12 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const requestUrl = error.config?.url
+    const isAuthRequest =
+      typeof requestUrl === 'string' &&
+      (requestUrl.includes('/users/login') || requestUrl.includes('/users/register'))
+
+    if (error.response?.status === 401 && !isAuthRequest) {
       const auth = useAuthStore()
       auth.logout()
       router.push('/login')
