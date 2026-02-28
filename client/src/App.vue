@@ -22,12 +22,7 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
 
 body {
   margin: 0;
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
 }

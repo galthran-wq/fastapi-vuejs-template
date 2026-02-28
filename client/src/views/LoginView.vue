@@ -51,9 +51,7 @@ async function handleLogin() {
         {{ loading ? 'Signing in...' : 'Sign in' }}
       </button>
 
-      <p class="link">
-        Don't have an account? <RouterLink to="/register">Register</RouterLink>
-      </p>
+      <p class="link">Don't have an account? <RouterLink to="/register">Register</RouterLink></p>
     </form>
   </div>
 </template>

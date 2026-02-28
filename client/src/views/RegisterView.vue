@@ -68,9 +68,7 @@ async function handleRegister() {
         {{ loading ? 'Creating account...' : 'Create account' }}
       </button>
 
-      <p class="link">
-        Already have an account? <RouterLink to="/login">Sign in</RouterLink>
-      </p>
+      <p class="link">Already have an account? <RouterLink to="/login">Sign in</RouterLink></p>
     </form>
   </div>
 </template>
