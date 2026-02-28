@@ -5,14 +5,24 @@ services:
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
 
   server:
     volumes:
       - ./server/.env:/app/.env:ro
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
 
   client:
-    command: ["sh", "-c", "rm -rf /shared/* && cp -r /app/dist/* /shared/ && tail -f /dev/null"]
+    command: ["sh", "-c", "rm -rf /shared/* && cp -r /usr/share/nginx/html/* /shared/ && tail -f /dev/null"]
     volumes:
       - prod_client_build:/shared
     restart: unless-stopped

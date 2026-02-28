@@ -1,4 +1,4 @@
-.PHONY: dev-up dev-down dev-ps dev-logs dev-restart dev-db dev-make-migrations dev-test-db dev-test-migrate dev-test dev-lint dev-format prod-up prod-down prod-ps prod-logs prod-restart prod-build
+.PHONY: dev-up dev-down dev-ps dev-logs dev-restart dev-db dev-make-migrations dev-test-db dev-test-migrate dev-test dev-lint dev-format dev-shell setup prod-up prod-down prod-ps prod-logs prod-restart prod-build
 .SILENT:
 
 -include .env
@@ -6,6 +6,11 @@ export
 ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 $(ARGS):
 	@true
+
+setup:
+	@test -f .env || (cp .env.example .env && echo "Created .env from .env.example")
+	@test -f server/.env || (cp server/.env.example server/.env && echo "Created server/.env from server/.env.example")
+	@echo "Environment files ready."
 
 dev-up:
 	docker compose -p $(COMPOSE_PROJECT_NAME_DEV) -f docker-compose.yaml -f docker-compose.override.yaml up -d $(ARGS)
@@ -45,6 +50,9 @@ dev-lint:
 
 dev-format:
 	docker compose -p $(COMPOSE_PROJECT_NAME_DEV) exec server bash -lc "ruff format src tests && ruff check --fix src tests"
+
+dev-shell:
+	docker compose -p $(COMPOSE_PROJECT_NAME_DEV) exec server bash
 
 dev-superuser:
 	@if [ -z "$(ARGS)" ]; then \

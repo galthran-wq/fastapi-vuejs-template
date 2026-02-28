@@ -10,7 +10,14 @@ class Base(DeclarativeBase):
     pass
 
 
-postgres_engine = create_async_engine(settings.postgres_url, echo=settings.debug)
+postgres_engine = create_async_engine(
+    settings.postgres_url,
+    echo=settings.debug,
+    pool_size=20,
+    max_overflow=10,
+    pool_pre_ping=True,
+    pool_recycle=300,
+)
 AsyncSessionLocal = async_sessionmaker(postgres_engine, class_=AsyncSession, expire_on_commit=False)
 
 

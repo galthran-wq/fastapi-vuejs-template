@@ -34,12 +34,12 @@ async def logging_middleware(request: Request, call_next: Callable[[Request], Aw
 
 
 def register_middleware(app: FastAPI) -> None:
-    app.middleware("http")(logging_middleware)
-    app.middleware("http")(request_id_middleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
-        allow_credentials=True,
+        allow_credentials="*" not in settings.cors_origins,
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    app.middleware("http")(logging_middleware)
+    app.middleware("http")(request_id_middleware)
