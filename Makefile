@@ -40,6 +40,27 @@ dev-test-migrate:
 dev-test:
 	docker compose -p $(COMPOSE_PROJECT_NAME_DEV) exec -e POSTGRES_DB=$(POSTGRES_DB)_test -e PYTHONPATH=/app server bash -lc "pytest tests/ -v $(ARGS)"
 
+dev-superuser:
+	@if [ -z "$(ARGS)" ]; then \
+		echo "Usage: make dev-superuser <email_or_uuid|--list|--help>"; \
+		echo "Examples:"; \
+		echo "  make dev-superuser --list"; \
+		echo "  make dev-superuser admin@example.com"; \
+		echo "  make dev-superuser --help"; \
+	else \
+		docker compose -p $(COMPOSE_PROJECT_NAME_DEV) -f docker-compose.yaml -f docker-compose.override.yaml exec -w /app server python scripts/make_superuser.py $(ARGS); \
+	fi
+
+dev-user:
+	@if [ -z "$(word 1,$(ARGS))" ] || [ -z "$(word 2,$(ARGS))" ]; then \
+		echo "Usage: make dev-user <email> <password>"; \
+		echo "Examples:"; \
+		echo "  make dev-user user@example.com mypassword"; \
+		echo "  make dev-user --help                        # Show help"; \
+	else \
+		docker compose -p $(COMPOSE_PROJECT_NAME_DEV) -f docker-compose.yaml -f docker-compose.override.yaml exec -w /app server python scripts/create_user.py $(ARGS); \
+	fi
+
 prod-up:
 	docker compose -p $(COMPOSE_PROJECT_NAME_PROD) -f docker-compose.yaml -f docker-compose.prod.yaml up -d $(ARGS)
 
@@ -57,3 +78,24 @@ prod-restart:
 
 prod-build:
 	docker compose -p $(COMPOSE_PROJECT_NAME_PROD) build $(ARGS)
+
+prod-superuser:
+	@if [ -z "$(ARGS)" ]; then \
+		echo "Usage: make prod-superuser <email_or_uuid|--list|--help>"; \
+		echo "Examples:"; \
+		echo "  make prod-superuser --list"; \
+		echo "  make prod-superuser admin@example.com"; \
+		echo "  make prod-superuser --help"; \
+	else \
+		docker compose -p $(COMPOSE_PROJECT_NAME_PROD) -f docker-compose.yaml -f docker-compose.prod.yaml exec -w /app server python scripts/make_superuser.py $(ARGS); \
+	fi
+
+prod-user:
+	@if [ -z "$(word 1,$(ARGS))" ] || [ -z "$(word 2,$(ARGS))" ]; then \
+		echo "Usage: make prod-user <email> <password>"; \
+		echo "Examples:"; \
+		echo "  make prod-user user@example.com mypassword"; \
+		echo "  make prod-user --help                        # Show help"; \
+	else \
+		docker compose -p $(COMPOSE_PROJECT_NAME_PROD) -f docker-compose.yaml -f docker-compose.prod.yaml exec -w /app server python scripts/create_user.py $(ARGS); \
+	fi
