@@ -4,7 +4,6 @@ from uuid import UUID
 import structlog
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-
 from src.models.postgres.users import UserModel
 
 logger = structlog.get_logger()

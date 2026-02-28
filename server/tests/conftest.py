@@ -4,7 +4,6 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import StaticPool
-
 from src.core.auth import create_token_for_user, get_password_hash
 from src.core.database import Base, get_postgres_session
 from src.main import app
