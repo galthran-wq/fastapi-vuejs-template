@@ -9,7 +9,7 @@
       "title": "Active Requests",
       "gridPos": {"h": 6, "w": 6, "x": 0, "y": 0},
       "targets": [
-        {"expr": "http_requests_active", "legendFormat": "active"}
+        {"expr": "http_requests_in_progress", "legendFormat": "active"}
       ]
     },
     {
@@ -17,7 +17,7 @@
       "title": "Requests Total",
       "gridPos": {"h": 8, "w": 12, "x": 6, "y": 0},
       "targets": [
-        {"expr": "sum(rate(http_requests_total[5m])) by (method, endpoint, status_code)", "legendFormat": "{{method}} {{endpoint}} {{status_code}}"}
+        {"expr": "sum(rate(http_requests_total[5m])) by (method, handler, status)", "legendFormat": "{{method}} {{handler}} {{status}}"}
       ],
       "lines": true,
       "fill": 1
@@ -27,7 +27,7 @@
       "title": "Request Duration (p95)",
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 6},
       "targets": [
-        {"expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, method, endpoint))", "legendFormat": "{{method}} {{endpoint}} p95"}
+        {"expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, method, handler))", "legendFormat": "{{method}} {{handler}} p95"}
       ],
       "lines": true,
       "fill": 1
@@ -41,6 +41,5 @@
   "timepicker": {},
   "timezone": "",
   "title": "FastAPI Overview",
-  "version": 1
+  "version": 2
 }
-

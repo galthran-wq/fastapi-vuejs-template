@@ -18,6 +18,8 @@ make dev-logs            # Tail logs (add service name to filter: make dev-logs 
 make dev-build           # Rebuild Docker images
 make dev-db              # Open psql shell in postgres container
 make dev-make-migrations "message"  # Autogenerate Alembic migration
+make dev-lint            # Run ruff check + ruff format --check + mypy
+make dev-format          # Auto-fix with ruff format + ruff check --fix
 ```
 
 ### Testing
@@ -65,12 +67,19 @@ Dev uses `docker-compose.yaml` + `docker-compose.override.yaml`. Prod uses `dock
 
 ### Backend (`server/`)
 
-- **Python 3.11**, FastAPI, async SQLAlchemy 2.0 + asyncpg, Alembic migrations
-- Entry point: `src/main.py` — creates FastAPI app, adds Prometheus middleware
-- Config: `src/core/config.py` — pydantic-settings, loads `.env` file based on `ENV` var (`development` → `.env`, `test` → `.env.test`, `production` → `.env.prod`)
+- **Python 3.12**, FastAPI, async SQLAlchemy 2.0 + asyncpg, Alembic migrations
+- **Package management**: uv + pyproject.toml (not pip/requirements.txt)
+- Entry point: `src/main.py` — app factory pattern (`create_app()`)
+- Config: `src/core/config.py` — pydantic-settings, single `.env` file, tests override via env vars
 - Database: `src/core/database.py` — async engine, `AsyncSessionLocal`, `get_postgres_session` dependency
+- Auth: `src/core/auth.py` — JWT bearer tokens, `get_current_user` / `get_current_superuser` dependencies
 - Models: `src/models/postgres/` — SQLAlchemy models; register new models in `__init__.py` for Alembic autogenerate
-- Metrics: `src/core/metrics.py` — ASGI middleware tracking request count, duration, and active connections
+- API routing: `src/api/router.py` aggregates all endpoint routers; individual endpoints in `src/api/endpoints/`
+- Repository pattern: `src/repositories/` — abstract base + concrete implementations
+- Logging: structlog (JSON in prod, console in dev), request ID tracking via middleware
+- Metrics: prometheus-fastapi-instrumentator (auto-instrumented, exposed at `/metrics`)
+- Exceptions: `src/core/exceptions.py` — `AppError(status_code, detail)` for business logic errors
+- Middleware: `src/core/middleware.py` — request ID, request logging, CORS
 - Container startup: `startup.sh` runs `alembic upgrade head` then starts uvicorn
 
 ### Frontend (`client/`)
@@ -82,7 +91,7 @@ Dev uses `docker-compose.yaml` + `docker-compose.override.yaml`. Prod uses `dock
 
 ### Code Style
 
-- **Python**: async-first, type-annotated, repository pattern with abstract base classes
+- **Python**: ruff (line-length=120, py312), mypy strict mode, async-first, type-annotated, repository pattern
 - **TypeScript/Vue**: ESLint + Prettier (`semi: false`, `singleQuote: true`, `printWidth: 100`), 2-space indent, LF line endings
 
 ## Environment Setup
@@ -94,6 +103,8 @@ Dev uses `docker-compose.yaml` + `docker-compose.override.yaml`. Prod uses `dock
 ## Key Patterns
 
 - **Adding a new model**: Create in `src/models/postgres/`, import in `src/models/postgres/__init__.py`, then `make dev-make-migrations "description"`
-- **Adding an API route**: Create router in `src/api/`, include it in `src/main.py` via `app.include_router()`
+- **Adding an API route**: Create router in `src/api/endpoints/`, include it in `src/api/router.py`
 - **Database sessions**: Use `get_postgres_session` as a FastAPI dependency (`Depends(get_postgres_session)`)
-- **Auth** (on feature branches): JWT bearer tokens via `src/core/auth.py`, dependencies `get_current_user` / `get_current_superuser`
+- **Auth-protected endpoints**: Use `Depends(get_current_user)` or `Depends(get_current_superuser)`
+- **Business errors**: Raise `AppError(status_code=400, detail="message")` — handled globally
+- **Logging**: Use `structlog.get_logger()`, not `logging.getLogger()`

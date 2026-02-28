@@ -2,7 +2,7 @@
 set -e
 
 echo "Running database migrations..."
-python -m alembic upgrade head
+alembic upgrade head
 echo "Migrations completed!"
 echo "Starting server..."
-exec python -m src.main 
+exec uvicorn src.main:app --host 0.0.0.0 --port 8000

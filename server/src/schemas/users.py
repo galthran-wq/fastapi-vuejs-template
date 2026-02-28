@@ -1,18 +1,17 @@
-from pydantic import BaseModel, EmailStr
-from uuid import UUID
 from datetime import datetime
-from typing import Optional, Union
+from uuid import UUID
+
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class UserResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
-    email: Optional[str] = None
+    email: str | None = None
     is_verified: bool
     is_superuser: bool
     created_at: datetime
-
-    class Config:
-        from_attributes = True
 
 
 class UserRegisterRequest(BaseModel):
@@ -39,13 +38,13 @@ class CreateUserRequest(BaseModel):
 class CreateUserResponse(BaseModel):
     success: bool
     message: str
-    user: Optional[UserResponse] = None
+    user: UserResponse | None = None
 
 
 class DeleteUserRequest(BaseModel):
-    user_identifier: Union[UUID, EmailStr]
+    user_identifier: UUID | EmailStr
 
 
 class DeleteUserResponse(BaseModel):
     success: bool
-    message: str 
+    message: str

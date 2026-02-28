@@ -8,9 +8,10 @@ services:
       - ./data/postgres_dev:/var/lib/postgresql/data
 
   server:
-    command: ["bash", "startup.sh"]
+    command: ["bash", "-c", "uv sync && bash startup.sh"]
     volumes:
       - ./server:/app
+      - server_venv:/app/.venv
       - ./server/.env:/app/.env:ro
 
   client:
@@ -45,5 +46,6 @@ services:
 volumes:
   dev_postgres_data:
   dev_mongodb_data:
+  server_venv:
   prometheus_data:
   grafana_data: 
