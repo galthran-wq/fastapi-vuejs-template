@@ -41,7 +41,7 @@ services:
       - app-network
 
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v3.3.0
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -52,7 +52,7 @@ services:
       - app-network
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:11.5.2
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
     depends_on:
