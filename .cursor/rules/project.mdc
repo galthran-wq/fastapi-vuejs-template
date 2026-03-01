@@ -21,6 +21,6 @@ Full-stack web application: FastAPI backend + Vue 3 frontend, Docker Compose orc
 ## Architecture
 
 - Backend at `server/`, frontend at `client/`, nginx configs at `nginx/`
-- Dev: `docker-compose.yaml` + `docker-compose.override.yaml` (port 5746)
+- Dev: `docker-compose.yaml` + `docker-compose.dev.yaml` (port 5746)
 - Prod: `docker-compose.yaml` + `docker-compose.prod.yaml`
 - Nginx routes: `/` → frontend, `/api/*` → backend, `/health`, `/ready`, `/metrics`
