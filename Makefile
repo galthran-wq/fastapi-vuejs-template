@@ -1,19 +1,19 @@
 .PHONY: dev-up dev-down dev-ps dev-logs dev-restart dev-db dev-make-migrations dev-test-db dev-test-migrate dev-test dev-lint dev-format dev-shell setup prod-up prod-down prod-ps prod-logs prod-restart prod-build
 .SILENT:
 
--include .env
+-include .env.dev
 export
 ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 $(ARGS):
 	@true
 
 setup:
-	@test -f .env || (cp .env.example .env && echo "Created .env from .env.example")
-	@test -f server/.env || (cp server/.env.example server/.env && echo "Created server/.env from server/.env.example")
+	@test -f .env.dev || (cp .env.dev.example .env.dev && echo "Created .env.dev from .env.dev.example")
+	@test -f .env.prod || (cp .env.prod.example .env.prod && echo "Created .env.prod from .env.prod.example")
 	@echo "Environment files ready."
 
 dev-up:
-	docker compose -p $(COMPOSE_PROJECT_NAME_DEV) -f docker-compose.yaml -f docker-compose.override.yaml up -d $(ARGS)
+	docker compose -p $(COMPOSE_PROJECT_NAME_DEV) --env-file .env.dev -f docker-compose.yaml -f docker-compose.dev.yaml up -d $(ARGS)
 
 dev-down:
 	docker compose -p $(COMPOSE_PROJECT_NAME_DEV) down $(ARGS)
@@ -62,7 +62,7 @@ dev-superuser:
 		echo "  make dev-superuser admin@example.com"; \
 		echo "  make dev-superuser --help"; \
 	else \
-		docker compose -p $(COMPOSE_PROJECT_NAME_DEV) -f docker-compose.yaml -f docker-compose.override.yaml exec -w /app server python scripts/make_superuser.py $(ARGS); \
+		docker compose -p $(COMPOSE_PROJECT_NAME_DEV) --env-file .env.dev -f docker-compose.yaml -f docker-compose.dev.yaml exec -w /app server python scripts/make_superuser.py $(ARGS); \
 	fi
 
 dev-user:
@@ -72,11 +72,11 @@ dev-user:
 		echo "  make dev-user user@example.com mypassword"; \
 		echo "  make dev-user --help                        # Show help"; \
 	else \
-		docker compose -p $(COMPOSE_PROJECT_NAME_DEV) -f docker-compose.yaml -f docker-compose.override.yaml exec -w /app server python scripts/create_user.py $(ARGS); \
+		docker compose -p $(COMPOSE_PROJECT_NAME_DEV) --env-file .env.dev -f docker-compose.yaml -f docker-compose.dev.yaml exec -w /app server python scripts/create_user.py $(ARGS); \
 	fi
 
 prod-up:
-	docker compose -p $(COMPOSE_PROJECT_NAME_PROD) -f docker-compose.yaml -f docker-compose.prod.yaml up -d $(ARGS)
+	docker compose -p $(COMPOSE_PROJECT_NAME_PROD) --env-file .env.prod -f docker-compose.yaml -f docker-compose.prod.yaml up -d $(ARGS)
 
 prod-down:
 	docker compose -p $(COMPOSE_PROJECT_NAME_PROD) down $(ARGS)
@@ -101,7 +101,7 @@ prod-superuser:
 		echo "  make prod-superuser admin@example.com"; \
 		echo "  make prod-superuser --help"; \
 	else \
-		docker compose -p $(COMPOSE_PROJECT_NAME_PROD) -f docker-compose.yaml -f docker-compose.prod.yaml exec -w /app server python scripts/make_superuser.py $(ARGS); \
+		docker compose -p $(COMPOSE_PROJECT_NAME_PROD) --env-file .env.prod -f docker-compose.yaml -f docker-compose.prod.yaml exec -w /app server python scripts/make_superuser.py $(ARGS); \
 	fi
 
 prod-user:
@@ -111,5 +111,5 @@ prod-user:
 		echo "  make prod-user user@example.com mypassword"; \
 		echo "  make prod-user --help                        # Show help"; \
 	else \
-		docker compose -p $(COMPOSE_PROJECT_NAME_PROD) -f docker-compose.yaml -f docker-compose.prod.yaml exec -w /app server python scripts/create_user.py $(ARGS); \
+		docker compose -p $(COMPOSE_PROJECT_NAME_PROD) --env-file .env.prod -f docker-compose.yaml -f docker-compose.prod.yaml exec -w /app server python scripts/create_user.py $(ARGS); \
 	fi

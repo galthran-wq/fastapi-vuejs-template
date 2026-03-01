@@ -18,7 +18,7 @@ def configure_logging() -> None:
             structlog.processors.add_log_level,
             structlog.processors.StackInfoRenderer(),
             structlog.processors.TimeStamper(fmt="iso"),
-            structlog.dev.ConsoleRenderer() if settings.debug else structlog.processors.JSONRenderer(),
+            structlog.dev.ConsoleRenderer() if settings.is_debug else structlog.processors.JSONRenderer(),
         ],
         wrapper_class=structlog.make_filtering_bound_logger(log_level),
         context_class=dict,
@@ -39,7 +39,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 def create_app() -> FastAPI:
     application = FastAPI(
         title=settings.app_name,
-        debug=settings.debug,
+        debug=settings.is_debug,
         lifespan=lifespan,
     )
 

@@ -59,7 +59,7 @@ cd client && npm run format       # Prettier
 - **nginx** — Reverse proxy (dev port: 5746)
 - **prometheus** / **grafana** — Monitoring stack
 
-Dev uses `docker-compose.yaml` + `docker-compose.override.yaml`. Prod uses `docker-compose.yaml` + `docker-compose.prod.yaml`.
+Dev uses `docker-compose.yaml` + `docker-compose.dev.yaml`. Prod uses `docker-compose.yaml` + `docker-compose.prod.yaml`.
 
 ### URL Routing (Nginx)
 
@@ -79,7 +79,7 @@ Dev uses `docker-compose.yaml` + `docker-compose.override.yaml`. Prod uses `dock
 - **Python 3.12**, FastAPI, async SQLAlchemy 2.0 + asyncpg, Alembic migrations
 - **Package management**: uv + pyproject.toml (not pip/requirements.txt)
 - Entry point: `src/main.py` — app factory pattern (`create_app()`)
-- Config: `src/core/config.py` — pydantic-settings, single `.env` file, SECRET_KEY validated at startup
+- Config: `src/core/config.py` — pydantic-settings, `extra="ignore"`, env vars injected via Docker Compose `env_file`, `SECRET_KEY` required (no default), `is_debug` derived from `LOG_LEVEL`
 - Database: `src/core/database.py` — async engine with connection pooling, `AsyncSessionLocal`, `get_postgres_session` dependency
 - Auth: `src/core/auth.py` — JWT bearer tokens, `get_current_user` / `get_current_superuser` dependencies
 - Models: `src/models/postgres/` — SQLAlchemy models; register new models in `__init__.py` for Alembic autogenerate
@@ -111,7 +111,7 @@ Dev uses `docker-compose.yaml` + `docker-compose.override.yaml`. Prod uses `dock
 
 ## Environment Setup
 
-1. Run `make setup` (copies `.env.example` files)
+1. Run `make setup` (creates `.env.dev` and `.env.prod` from examples)
 2. Start dev: `make dev-up`
 3. App at `http://localhost:5746`, API docs at `http://localhost:5746/api/docs`
 

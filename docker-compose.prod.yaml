@@ -12,8 +12,8 @@ services:
           memory: 1G
 
   server:
-    volumes:
-      - ./server/.env:/app/.env:ro
+    env_file:
+      - .env.prod
     restart: unless-stopped
     deploy:
       resources:

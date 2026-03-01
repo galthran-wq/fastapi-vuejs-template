@@ -9,10 +9,11 @@ services:
 
   server:
     command: ["bash", "-c", "uv sync && bash startup.sh"]
+    env_file:
+      - .env.dev
     volumes:
       - ./server:/app
       - server_venv:/app/.venv
-      - ./server/.env:/app/.env:ro
 
   client:
     build:

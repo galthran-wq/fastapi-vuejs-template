@@ -1,7 +1,7 @@
 import os
 from collections.abc import AsyncIterator
 
-os.environ.setdefault("DEBUG", "true")
+os.environ.setdefault("SECRET_KEY", "test-secret-key")
 
 import pytest  # noqa: E402
 from httpx import ASGITransport, AsyncClient  # noqa: E402
