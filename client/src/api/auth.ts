@@ -24,19 +24,9 @@ export async function createAnonUser(): Promise<TokenResponse> {
   return data
 }
 
-export async function registerUser(email: string, password: string): Promise<TokenResponse> {
-  // Step 1: create anonymous user to get a token
-  const anon = await createAnonUser()
-  localStorage.setItem('token', anon.access_token)
-
-  // Step 2: register with email/password using the anon token
-  try {
-    const { data } = await api.post<TokenResponse>('/users/register', { email, password })
-    return data
-  } catch (error) {
-    localStorage.removeItem('token')
-    throw error
-  }
+export async function registerWithToken(email: string, password: string): Promise<TokenResponse> {
+  const { data } = await api.post<TokenResponse>('/users/register', { email, password })
+  return data
 }
 
 export async function getCurrentUser(): Promise<UserResponse> {

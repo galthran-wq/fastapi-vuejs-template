@@ -1,7 +1,17 @@
 from datetime import datetime
+from typing import Annotated
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import AfterValidator, BaseModel, ConfigDict, EmailStr
+
+
+def _validate_password_length(v: str) -> str:
+    if len(v) < 6:
+        raise ValueError("Password must be at least 6 characters long")
+    return v
+
+
+Password = Annotated[str, AfterValidator(_validate_password_length)]
 
 
 class UserResponse(BaseModel):
@@ -16,7 +26,7 @@ class UserResponse(BaseModel):
 
 class UserRegisterRequest(BaseModel):
     email: EmailStr
-    password: str
+    password: Password
 
 
 class UserLoginRequest(BaseModel):
@@ -32,7 +42,7 @@ class TokenResponse(BaseModel):
 
 class CreateUserRequest(BaseModel):
     email: EmailStr
-    password: str
+    password: Password
 
 
 class CreateUserResponse(BaseModel):
